@@ -1,0 +1,15 @@
+table {
+    margin-top: 10px;
+}
+
+td, th {
+    padding: 5px;
+}
+
+table, th, td {
+    border: 1px solid black;
+}
+
+#fruits_search, #vegetables_search {
+    margin: 10px;
+}

@@ -1,0 +1,4 @@
+bottle
+dbf
+pyyaml
+pywin32

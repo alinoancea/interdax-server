@@ -1,3 +1,8 @@
+# Project specific
+local_data/
+config.yaml
+storage/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
