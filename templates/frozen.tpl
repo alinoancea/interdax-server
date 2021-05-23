@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="static/css/bootstrap.min.css">
         <link href="static/css/styles.css" rel="stylesheet">
         
-        <title>Configurare fructe si legume</title>
+        <title>Interdax server</title>
     </head>
     <body>
         <div id="header">
@@ -30,17 +30,17 @@
         <div id="content" class="bg-light">
             <div class="container">
                 <h2>Configurare elemente afisate pe ecran</h2>
-                <h3>Fructe</h3>
+                <h3>Congelate 1</h3>
                 <div id="item_search">
                     Cauta 
-                    <input id=fruit type=text list=products style="width:400px" />
-                    <button type=button onClick="addItem('fruit', 'fruits');">Adauga</button>
+                    <input id=frozen1 type=text list=products style="width:400px" />
+                    <button type=button onClick="addItem('frozen1', 'frozen1');">Adauga</button>
                     <datalist id=products>
                         % for p in products:
                             <option value="{{p['barcode']}} | {{p['name']}}">
                         % end
                     </datalist>
-                    <table id=table_fruits>
+                    <table id=table_frozen1>
                         <tr>
                             <th>
                                 No
@@ -60,12 +60,63 @@
                         </tr>
                     </table>
                 </div>
-                <h3>Legume</h3>
+
+                <h3>Congelate 2</h3>
                 <div id="item_search">
                     Cauta 
-                    <input id=vegetable type=text list=products style="width:400px" />
-                    <button type=button onClick="addItem('vegetable', 'vegetables');">Adauga</button>
-                    <table id=table_vegetables>
+                    <input id=frozen2 type=text list=products style="width:400px" />
+                    <button type=button onClick="addItem('frozen2', 'frozen2');">Adauga</button>
+                    <table id=table_frozen2>
+                        <tr>
+                            <th>
+                                No
+                            </th>
+                            <th>
+                                Denumire
+                            </th>
+                            <th>
+                                Pret
+                            </th>
+                            <th>
+                                U.M
+                            </th>
+                            <th>
+                                Optiuni
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+                <h3>Peste</h3>
+                <div id="item_search">
+                    Cauta 
+                    <input id=fish type=text list=products style="width:400px" />
+                    <button type=button onClick="addItem('fish', 'fish');">Adauga</button>
+                    <table id=table_fish>
+                        <tr>
+                            <th>
+                                No
+                            </th>
+                            <th>
+                                Denumire
+                            </th>
+                            <th>
+                                Pret
+                            </th>
+                            <th>
+                                U.M
+                            </th>
+                            <th>
+                                Optiuni
+                            </th>
+                        </tr>
+                    </table>
+                </div>
+                <h3>Legume congelate</h3>
+                <div id="item_search">
+                    Cauta 
+                    <input id=frozen_vegetables type=text list=products style="width:400px" />
+                    <button type=button onClick="addItem('frozen_vegetables', 'frozen_vegetables');">Adauga</button>
+                    <table id=table_frozen_vegetables>
                         <tr>
                             <th>
                                 No
@@ -87,6 +138,8 @@
                 </div>
             </div>
         </div>
+
+    </body>
     <script src="static/js/jquery-3.5.1.min.js"></script>
     <script src="static/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -103,17 +156,14 @@
                 dataType: "json",
                 success: function (result, status, xhr) {
                     let table_fruits = $('#table_' + gama);
-                    if (gama == 'fruits' || gama == 'vegetables')
-                        result = result[gama]['extras'];
-                    else
-                        result = result[gama];
-                    for (let i = 0; i < result.length; i++) {
+                    for (let i = 0; i < result[gama].length; i++) {
+                        console.log(i)
                         let tr = $('<tr></tr>');
                         tr.append($('<td></td>').text(i+1));
-                        tr.append($('<td></td>').text(result[i]['name']));
-                        tr.append($('<td></td>').text(result[i]['price']));
-                        tr.append($('<td></td>').text(result[i]['um']));
-                        tr.append($('<td></td>').append($('<a></a>').attr('href', '/delete?gama=' + gama + '&barcode=' + result[i]['barcode']).text('Sterge')));
+                        tr.append($('<td></td>').text(result[gama][i]['name']));
+                        tr.append($('<td></td>').text(result[gama][i]['price']));
+                        tr.append($('<td></td>').text(result[gama][i]['um']));
+                        tr.append($('<td></td>').append($('<a></a>').attr('href', '/delete?gama=' + gama + '&barcode=' + result[gama][i]['barcode']).text('Sterge')));
                         tr.appendTo(table_fruits);
                     }
                 }
@@ -121,12 +171,14 @@
         }
 
         $(document).ready(function() {
-            // fruits
-            get_items('fruits');
-            
-            // vegetables
-            get_items('vegetables');
+            // frozen1
+            get_items('frozen1');
+            // frozen2
+            get_items('frozen2');
+            // fish
+            get_items('fish');
+            // frozen_vegetables
+            get_items('frozen_vegetables');
         });
-    </script>
-    </body>
+    </script>    
 </html>

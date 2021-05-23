@@ -2,6 +2,7 @@
 local_data/
 config.yaml
 storage/
+.vscode/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
