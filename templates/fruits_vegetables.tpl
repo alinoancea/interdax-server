@@ -7,7 +7,7 @@
         <link rel="stylesheet" href="static/css/bootstrap.min.css">
         <link href="static/css/styles.css" rel="stylesheet">
         
-        <title>Configurare fructe si legume</title>
+        <title>Configurare fructe & legume</title>
     </head>
     <body>
         <div id="header">
@@ -41,7 +41,7 @@
                         % end
                     </datalist>
                     <table id=table_fruits>
-                        <tr>
+                        <tr> 
                             <th>
                                 No
                             </th>
@@ -53,6 +53,9 @@
                             </th>
                             <th>
                                 U.M
+                            </th>
+                            <th>
+                                Cantitate
                             </th>
                             <th>
                                 Optiuni
@@ -80,6 +83,9 @@
                                 U.M
                             </th>
                             <th>
+                                Cantitate
+                            </th>
+                            <th>
                                 Optiuni
                             </th>
                         </tr>
@@ -103,16 +109,17 @@
                 dataType: "json",
                 success: function (result, status, xhr) {
                     let table_fruits = $('#table_' + gama);
-                    if (gama == 'fruits' || gama == 'vegetables')
-                        result = result[gama]['extras'];
-                    else
-                        result = result[gama];
+                    result = result[gama]['extras'];
                     for (let i = 0; i < result.length; i++) {
                         let tr = $('<tr></tr>');
+                        if (result[i]['quantity'] == 0) {
+                            tr.css('background-color', 'crimson');
+                        }
                         tr.append($('<td></td>').text(i+1));
                         tr.append($('<td></td>').text(result[i]['name']));
                         tr.append($('<td></td>').text(result[i]['price']));
                         tr.append($('<td></td>').text(result[i]['um']));
+                        tr.append($('<td></td>').text(result[i]['quantity']));
                         tr.append($('<td></td>').append($('<a></a>').attr('href', '/delete?gama=' + gama + '&barcode=' + result[i]['barcode']).text('Sterge')));
                         tr.appendTo(table_fruits);
                     }

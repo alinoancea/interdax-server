@@ -39,12 +39,8 @@ def get_products_by_gama(gama):
     return sorted(products, key=lambda i: i.get('name'))
 
 
-def delete_product_from_local(display, product_barcode):
-    database.delete_product_to_local(display, product_barcode)
-
-
 def add_product_to_local(display, product_barcode):
-    database.add_product_to_local(display, product_barcode)
+    database.add_product_to_display(display, product_barcode)
 
 
 def get_single_product(product_name):
@@ -57,9 +53,7 @@ def check_local_storage():
     time_sleep = 300
 
     while True:
-        for display in CONFIG_FILE['company']['display']:
-            database.check_local_products(display)
-        database.insert_products_into_local_database()
+        database.insert_local_products_into_database()
         time.sleep(time_sleep)
 
 
@@ -93,30 +87,30 @@ def json_items():
     bottle.response.add_header('Access-Control-Allow-Origin', '*')
 
     if 'fruits' in gama:
-        extras = sorted(database.get_product_from_local(display='fruits'), key=lambda i: i.get('name'))
+        extras = sorted(database.get_product_from_database(display='fruits'), key=lambda i: i.get('name'))
         fruits = sorted(database.get_products_by_gama('FRUCTE') + extras, key=lambda i: i.get('name'))
         r['fruits'] = {
             'fruits': fruits,
             'extras': extras
         }
     elif 'vegetables' in gama:
-        extras = sorted(database.get_product_from_local(display='vegetables'), key=lambda i: i.get('name'))
+        extras = sorted(database.get_product_from_database(display='vegetables'), key=lambda i: i.get('name'))
         vegetables = sorted(database.get_products_by_gama('LEGUME') + extras,  key=lambda i: i.get('name'))
         r['vegetables'] = {
             'vegetables': vegetables,
             'extras': extras
         }
     elif 'frozen1' in gama:
-        frozen1 = sorted(database.get_product_from_local(display='frozen1'), key=lambda i: i.get('name'))
+        frozen1 = sorted(database.get_product_from_database(display='frozen1'), key=lambda i: i.get('name'))
         r['frozen1'] = frozen1
     elif 'frozen2' in gama:
-        frozen2 = sorted(database.get_product_from_local(display='frozen2'), key=lambda i: i.get('name'))
+        frozen2 = sorted(database.get_product_from_database(display='frozen2'), key=lambda i: i.get('name'))
         r['frozen2'] = frozen2
     elif 'fish' in gama:
-        fish = sorted(database.get_product_from_local(display='fish'), key=lambda i: i.get('name'))
+        fish = sorted(database.get_product_from_database(display='fish'), key=lambda i: i.get('name'))
         r['fish'] = fish
     elif 'frozen_vegetables' in gama:
-        frozen_vegetables = sorted(database.get_product_from_local(display='frozen_vegetables'), key=lambda i: i.get('name'))
+        frozen_vegetables = sorted(database.get_product_from_database(display='frozen_vegetables'), key=lambda i: i.get('name'))
         r['frozen_vegetables'] = frozen_vegetables
 
     return json.dumps(r)
@@ -135,7 +129,7 @@ def delete_from_local():
     gama = bottle.request.query.get('gama')
     barcode = bottle.request.query.get('barcode')
 
-    database.delete_product_to_local(gama, barcode)
+    database.delete_product_from_display(gama, barcode)
 
     bottle.redirect('/fruits_vegetables' if gama in ('fruits', 'vegetables') else '/frozen')
 
@@ -145,7 +139,7 @@ def add_to_local():
     gama = bottle.request.query.get('gama')
     barcode = bottle.request.query.get('barcode')
 
-    database.add_product_to_local(gama, barcode)
+    database.add_product_to_display(gama, barcode)
 
     bottle.redirect('/fruits_vegetables' if gama in ('fruits', 'vegetables') else '/frozen')
 

@@ -55,6 +55,9 @@
                                 U.M
                             </th>
                             <th>
+                                Cantitate
+                            </th>
+                            <th>
                                 Optiuni
                             </th>
                         </tr>
@@ -79,6 +82,9 @@
                             </th>
                             <th>
                                 U.M
+                            </th>
+                            <th>
+                                Cantitate
                             </th>
                             <th>
                                 Optiuni
@@ -106,12 +112,15 @@
                                 U.M
                             </th>
                             <th>
+                                Cantitate
+                            </th>
+                            <th>
                                 Optiuni
                             </th>
                         </tr>
                     </table>
                 </div>
-                <h3>Legume congelate</h3>
+                <h3>Preparate congelate</h3>
                 <div id="item_search">
                     Cauta 
                     <input id=frozen_vegetables type=text list=products style="width:400px" />
@@ -129,6 +138,9 @@
                             </th>
                             <th>
                                 U.M
+                            </th>
+                            <th>
+                                Cantitate
                             </th>
                             <th>
                                 Optiuni
@@ -157,12 +169,15 @@
                 success: function (result, status, xhr) {
                     let table_fruits = $('#table_' + gama);
                     for (let i = 0; i < result[gama].length; i++) {
-                        console.log(i)
                         let tr = $('<tr></tr>');
+                        if (result[gama][i]['quantity'] == 0) {
+                            tr.css('background-color', 'crimson');
+                        }
                         tr.append($('<td></td>').text(i+1));
                         tr.append($('<td></td>').text(result[gama][i]['name']));
                         tr.append($('<td></td>').text(result[gama][i]['price']));
                         tr.append($('<td></td>').text(result[gama][i]['um']));
+                        tr.append($('<td></td>').text(result[gama][i]['quantity']));
                         tr.append($('<td></td>').append($('<a></a>').attr('href', '/delete?gama=' + gama + '&barcode=' + result[gama][i]['barcode']).text('Sterge')));
                         tr.appendTo(table_fruits);
                     }

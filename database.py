@@ -5,7 +5,6 @@ import dbf
 import yaml
 import os
 import datetime
-import time
 
 
 ROOT_PATH = os.path.dirname(__file__)
@@ -33,7 +32,7 @@ class Database(object):
         return self.connection.query(q)
 
 
-def insert_products_into_local_database():
+def insert_local_products_into_database():
     local_database = Database(CONFIG_FILE['stoc_file'])
     with local_database as db:
         # r['produs'] => denumire produs
@@ -75,8 +74,8 @@ def insert_products_into_local_database():
             unique_products[barcode]['quantity'] += quantity
 
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
+    c = LOCAL_DB.cursor()
     for k, v in unique_products.items():
-        c = LOCAL_DB.cursor()
         c.execute('''INSERT INTO products values ("%s", "%s", "%s", "%s", "%s", "%s")
                 ON CONFLICT (barcode) DO UPDATE SET name="%s", um="%s", price="%s", quantity="%s", gama="%s"''' 
                 % (k, v['name'], v['um'], v['price'], v['quantity'], v['gama'], v['name'], v['um'], v['price'], v['quantity'], v['gama']))
@@ -89,7 +88,7 @@ def get_all_products(display=''):
     d = []
     condition = 'WHERE gama = "%s"' % (TRANSLATE_GAMA[display],) if display else ''
 
-    c.execute('''SELECT * FROM products %s''' % (condition,))
+    c.execute('SELECT * FROM products %s' % (condition,))
     for i in c.fetchall():
         d.append({'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]})
 
@@ -101,7 +100,7 @@ def get_products_by_gama(gama):
     c = LOCAL_DB.cursor()
     d = []
 
-    c.execute('''SELECT * FROM products WHERE gama = "%s" and quantity != 0''' % (gama,))
+    c.execute('SELECT * FROM products WHERE gama = "%s" and quantity != 0' % (gama,))
     for i in c.fetchall():
         d.append({'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]})
 
@@ -129,7 +128,7 @@ def get_product_by_barcode(barcode):
     return {'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]}
 
 
-def check_product_on_display(product_barcode, display):
+def get_product_from_display(product_barcode, display):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
 
@@ -137,37 +136,28 @@ def check_product_on_display(product_barcode, display):
     return c.fetchone()
 
 
-def add_product_to_local(display, product_barcode):
+def add_product_to_display(display, product_barcode):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
     p = get_product_by_barcode(product_barcode)
     if not p:
         return
         
-    if check_product_on_display(product_barcode, display):
+    if get_product_from_display(product_barcode, display):
         return
 
     c.execute('''INSERT INTO %s VALUES (%s)''' % (display, p['barcode']))
     LOCAL_DB.commit()
 
 
-def delete_product_to_local(display, product_barcode):
+def delete_product_from_display(display, product_barcode):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
     c.execute('''DELETE FROM %s WHERE barcode = %s''' % (display, product_barcode))
     LOCAL_DB.commit()
 
 
-def check_local_products(display):
-    LOCAL_DB = sqlite3.connect('./storage/interdax.db')
-    c = LOCAL_DB.cursor()
-    c.execute('''DELETE FROM %s WHERE barcode IN (
-            SELECT d.barcode FROM %s d INNER JOIN products p ON (d.barcode = p.barcode) WHERE quantity = 0) ''' 
-            % (display, display))
-    LOCAL_DB.commit()
-
-
-def get_product_from_local(display):
+def get_product_from_database(display):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
     l = []
@@ -183,7 +173,7 @@ def translate_from_file_to_database():
         with open('storage/%s.txt' % (d,)) as fr:
             for l in fr.readlines():
                 name = l.strip().split('|')[0]
-                add_product_to_local(d, get_product_by_name(name)[0]['barcode'])
+                add_product_to_display(d, get_product_by_name(name)[0]['barcode'])
 
 
 def create_tables():
@@ -199,5 +189,4 @@ def create_tables():
 
 if __name__ == '__main__':
     # create_tables()
-    # insert_products_into_local_database()
     translate_from_file_to_database()
