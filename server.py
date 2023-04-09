@@ -11,7 +11,7 @@ from multiprocessing import Process
 
 import database
 
-__version__ = '0.0.2'
+__version__ = '0.1.0'
 
 ROOT_PATH = os.path.dirname(__file__)
 CONFIG_FILE = yaml.full_load(open(os.path.join(ROOT_PATH, 'config.yaml')).read())
@@ -56,14 +56,6 @@ def barcodes():
     return json.dumps(all_products)
 
 
-@bottle.route('/fruits_vegetables', method='GET')
-def fruits_vegetables():
-    products = convert_barcodes()
-
-    return bottle.template('templates/fruits_vegetables.tpl', company_name=CONFIG_FILE['company']['name'].upper(),
-            products=products)
-
-
 @bottle.route('/json_items', method='GET')
 def json_items():
     gama = bottle.request.query.get('gama').split(',')
@@ -102,32 +94,37 @@ def json_items():
     return json.dumps(r)
 
 
-@bottle.route('/frozen', method='GET')
-def frozen():
+@bottle.route('/displayConfiguration', method='GET')
+def displayConfiguration():
     products = convert_barcodes()
+    displays = CONFIG_FILE['company']['display']
 
-    return bottle.template('templates/frozen.tpl', company_name=CONFIG_FILE['company']['name'].upper(),
-            products=products)
+    return bottle.template(
+            'templates/displayConfiguration.tpl',
+            company_name=CONFIG_FILE['company']['name'].upper(),
+            displays=displays,
+            products=products
+    )
 
 
-@bottle.route('/delete', method='GET')
+@bottle.route('/product', method='DELETE')
 def delete_from_local():
-    gama = bottle.request.query.get('gama')
-    barcode = bottle.request.query.get('barcode')
+    gama = bottle.request.json.get('gama')
+    barcode = str(bottle.request.json.get('barcode'))
 
+    if not (gama and barcode):
+        return
     database.delete_product_from_display(gama, barcode)
 
-    bottle.redirect('/fruits_vegetables' if gama in ('fruits', 'vegetables') else '/frozen')
 
-
-@bottle.route('/add', method='GET')
+@bottle.route('/product', method='POST')
 def add_to_local():
-    gama = bottle.request.query.get('gama')
-    barcode = bottle.request.query.get('barcode')
+    gama = bottle.request.json.get('gama')
+    barcode = str(bottle.request.json.get('barcode'))
 
+    if not (gama and barcode):
+        return
     database.add_product_to_display(gama, barcode)
-
-    bottle.redirect('/fruits_vegetables' if gama in ('fruits', 'vegetables') else '/frozen')
 
 
 @bottle.route(r'/static/<type>/<filepath>', method='GET')

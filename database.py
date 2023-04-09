@@ -51,7 +51,7 @@ def insert_local_products_into_database():
             um = r['um'].strip()
             barcode = r['barcode']
             entry_date = r['datai'] or datetime.date.min
-            quantity = r['cantitp']
+            quantity = round(r['cantitp'], 2)
             gama = r['gama'].strip()
 
             if barcode not in unique_products:
