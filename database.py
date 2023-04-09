@@ -76,9 +76,9 @@ def insert_local_products_into_database():
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
     for k, v in unique_products.items():
-        c.execute('''INSERT INTO products values ("%s", "%s", "%s", "%s", "%s", "%s")
-                ON CONFLICT (barcode) DO UPDATE SET name="%s", um="%s", price="%s", quantity="%s", gama="%s"''' 
-                % (k, v['name'], v['um'], v['price'], v['quantity'], v['gama'], v['name'], v['um'], v['price'], v['quantity'], v['gama']))
+        c.execute('''INSERT INTO products values (?, ?, ?, ?, ?, ?)
+                ON CONFLICT (barcode) DO UPDATE SET name=?, um=?, price=?, quantity=?, gama=?''',
+                (k, v['name'], v['um'], v['price'], v['quantity'], v['gama'], v['name'], v['um'], v['price'], v['quantity'], v['gama']))
     LOCAL_DB.commit()
 
 
@@ -100,7 +100,7 @@ def get_products_by_gama(gama):
     c = LOCAL_DB.cursor()
     d = []
 
-    c.execute('SELECT * FROM products WHERE gama = "%s" and quantity != 0' % (gama,))
+    c.execute('SELECT * FROM products WHERE gama = ? and quantity != 0', (gama,))
     for i in c.fetchall():
         d.append({'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]})
 
@@ -112,7 +112,7 @@ def get_product_by_name(name):
     c = LOCAL_DB.cursor()
     d = []
 
-    c.execute('SELECT * FROM products WHERE name LIKE "%' + name + '%"')
+    c.execute('SELECT * FROM products WHERE name LIKE "%?%"', (name,))
     for i in c.fetchall():
         d.append({'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]})
 
@@ -123,7 +123,7 @@ def get_product_by_barcode(barcode):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
 
-    c.execute('SELECT * FROM products WHERE barcode = %s' % (barcode,))
+    c.execute('SELECT * FROM products WHERE barcode = ?', (barcode,))
     i = c.fetchone()
     return {'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]}
 
@@ -132,7 +132,7 @@ def get_product_from_display(product_barcode, display):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
 
-    c.execute('SELECT * FROM %s WHERE barcode = %s' % (display, product_barcode))
+    c.execute('SELECT * FROM %s WHERE barcode = ?' % (display,), (product_barcode,))
     return c.fetchone()
 
 
@@ -146,14 +146,14 @@ def add_product_to_display(display, product_barcode):
     if get_product_from_display(product_barcode, display):
         return
 
-    c.execute('''INSERT INTO %s VALUES (%s)''' % (display, p['barcode']))
+    c.execute('''INSERT INTO %s VALUES (?)''' % (display,),(p['barcode'],))
     LOCAL_DB.commit()
 
 
 def delete_product_from_display(display, product_barcode):
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
-    c.execute('''DELETE FROM %s WHERE barcode = %s''' % (display, product_barcode))
+    c.execute('''DELETE FROM %s WHERE barcode = ?''' %(display,), (product_barcode,))
     LOCAL_DB.commit()
 
 
@@ -162,7 +162,7 @@ def get_product_from_database(display):
     c = LOCAL_DB.cursor()
     l = []
 
-    c.execute('SELECT p.barcode, p.name, p.um, p.price, p.quantity FROM products p INNER JOIN %s d ON (p.barcode = d.barcode)' % (display,))
+    c.execute('SELECT p.barcode, p.name, p.um, p.price, p.quantity FROM products p INNER JOIN "%s" d ON (p.barcode = d.barcode)' % (display,))
     for i in c.fetchall():
         l.append({'barcode': i[0], 'name': i[1], 'um': i[2], 'price': i[3], 'quantity': i[4]})
     return l

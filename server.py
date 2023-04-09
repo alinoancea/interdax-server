@@ -7,7 +7,7 @@ import os
 import platform
 import time
 
-from multiprocessing import Process
+from apscheduler.schedulers.background import BackgroundScheduler
 
 import database
 
@@ -33,14 +33,6 @@ if not CONFIG_FILE['http_server']['debug'] and platform.system().upper() == 'WIN
 
 def convert_barcodes():
     return database.get_all_products()
-
-
-def check_local_storage():
-    time_sleep = 300
-
-    while True:
-        database.insert_local_products_into_database()
-        time.sleep(time_sleep)
 
 
 @bottle.route('/')
@@ -109,22 +101,36 @@ def displayConfiguration():
 
 @bottle.route('/product', method='DELETE')
 def delete_from_local():
+    if not bottle.request.json:
+        bottle.abort(400, 'Invalid ContentType specified. Try JSON')
+
     gama = bottle.request.json.get('gama')
-    barcode = str(bottle.request.json.get('barcode'))
+    barcode = bottle.request.json.get('barcode')
+    if barcode:
+        barcode = str(barcode)
 
     if not (gama and barcode):
-        return
+        bottle.abort(400, 'Invalid parameters sent')
     database.delete_product_from_display(gama, barcode)
+
+    return {'status': 'ok'}
 
 
 @bottle.route('/product', method='POST')
 def add_to_local():
+    if not bottle.request.json:
+        bottle.abort(400, 'Invalid ContentType specified. Try JSON')
+
     gama = bottle.request.json.get('gama')
-    barcode = str(bottle.request.json.get('barcode'))
+    barcode = bottle.request.json.get('barcode')
+    if barcode:
+        barcode = str(barcode)
 
     if not (gama and barcode):
-        return
+        bottle.abort(400, 'Invalid parameters sent')
     database.add_product_to_display(gama, barcode)
+
+    return {'status': 'ok'}
 
 
 @bottle.route(r'/static/<type>/<filepath>', method='GET')
@@ -138,8 +144,11 @@ def favicon():
 
 
 if __name__ == '__main__':
-    p = Process(target=check_local_storage)
-    p.start()
+    # setup background check for price changes
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(database.insert_local_products_into_database, 'interval', seconds=300)
+    scheduler.start()
+
     bottle.debug(CONFIG_FILE['http_server']['debug'])
     bottle.run(
         host=CONFIG_FILE['http_server']['host'],
