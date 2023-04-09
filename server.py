@@ -158,5 +158,9 @@ if __name__ == '__main__':
     p = Process(target=check_local_storage)
     p.start()
     bottle.debug(CONFIG_FILE['http_server']['debug'])
-    bottle.run(host=CONFIG_FILE['http_server']['host'], port=CONFIG_FILE['http_server']['port'],
-            reloader=CONFIG_FILE['http_server']['auto_reload'], server='paste')
+    bottle.run(
+        host=CONFIG_FILE['http_server']['host'],
+        port=CONFIG_FILE['http_server']['port'],
+        reloader=CONFIG_FILE['http_server']['debug'], 
+        server='paste'
+    )

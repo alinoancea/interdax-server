@@ -2,7 +2,6 @@ http_server:
   host: '0.0.0.0'
   port: 18766 # 0x494E (IN)
   debug: False
-  auto_reload: False
 stoc_file:
   ./path/to/local/storage.dbf
 company:
