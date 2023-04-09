@@ -33,22 +33,6 @@ def convert_barcodes():
     return database.get_all_products()
 
 
-def get_products_by_gama(gama):
-    products = database.get_products_by_gama(gama)
-
-    return sorted(products, key=lambda i: i.get('name'))
-
-
-def add_product_to_local(display, product_barcode):
-    database.add_product_to_display(display, product_barcode)
-
-
-def get_single_product(product_name):
-    product = database.get_product_by_name(product_name,)
-    if product:
-        return product[0]
-
-
 def check_local_storage():
     time_sleep = 300
 

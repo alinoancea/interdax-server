@@ -168,14 +168,6 @@ def get_product_from_database(display):
     return l
 
 
-def translate_from_file_to_database():
-    for d in CONFIG_FILE['company']['display']:
-        with open('storage/%s.txt' % (d,)) as fr:
-            for l in fr.readlines():
-                name = l.strip().split('|')[0]
-                add_product_to_display(d, get_product_by_name(name)[0]['barcode'])
-
-
 def create_tables():
     LOCAL_DB = sqlite3.connect('./storage/interdax.db')
     c = LOCAL_DB.cursor()
@@ -187,6 +179,7 @@ def create_tables():
         c.execute('''CREATE TABLE %s(barcode INTEGER NOT NULL PRIMARY KEY, FOREIGN KEY(barcode) REFERENCES products(barcode))''' % (d,))
     LOCAL_DB.commit()
 
+
 if __name__ == '__main__':
-    # create_tables()
-    translate_from_file_to_database()
+    create_tables()
+    insert_local_products_into_database()
