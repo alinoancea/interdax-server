@@ -13,7 +13,11 @@ import database
 
 __version__ = '0.0.2'
 
-if platform.system().upper() == 'WINDOWS':
+ROOT_PATH = os.path.dirname(__file__)
+CONFIG_FILE = yaml.full_load(open(os.path.join(ROOT_PATH, 'config.yaml')).read())
+
+
+if not CONFIG_FILE['http_server']['debug'] and platform.system().upper() == 'WINDOWS':
     try:
         import win32gui # NOQA
         import win32con # NOQA
@@ -25,8 +29,6 @@ if platform.system().upper() == 'WINDOWS':
     except ImportError:
         print('[!] Could not import win32gui/win32con packages! Starting cmd window...')
 
-ROOT_PATH = os.path.dirname(__file__)
-CONFIG_FILE = yaml.full_load(open(os.path.join(ROOT_PATH, 'config.yaml')).read())
 
 
 def convert_barcodes():
