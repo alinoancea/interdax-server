@@ -7,5 +7,5 @@ stoc_file:
 company:
   name: COMPANY_NAME
   display:
-    - <CATEGORY1>
-    - <CATEGORY2>
+    <CATEGORY1>: <NAME1>
+    <CATEGORY2>: <NAME2>
