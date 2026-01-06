@@ -5,7 +5,6 @@ import yaml
 import json
 import os
 import platform
-import time
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -37,7 +36,7 @@ def convert_barcodes():
 
 @bottle.route('/')
 def home():
-    return bottle.template('templates/home.tpl', company_name=CONFIG_FILE['company']['name'].upper())
+    return bottle.template('home', company_name=CONFIG_FILE['company']['name'].upper())
 
 
 @bottle.route('/barcodes', method='GET')
@@ -92,7 +91,7 @@ def displayConfiguration():
     displays = CONFIG_FILE['company']['display']
 
     return bottle.template(
-            'templates/displayConfiguration.tpl',
+            'displayConfiguration',
             company_name=CONFIG_FILE['company']['name'].upper(),
             displays=displays,
             products=products

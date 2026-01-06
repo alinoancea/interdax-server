@@ -16,9 +16,6 @@
         <header class="my-header">
             <div class="container p-2">
                 <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                    <a href="/">
-                        <img src="static/resources/ldp.png" class="float-start mw-5 logo" alt="Home LDP">
-                    </a>
                     <span class="fs-4 fw-bolder p-2 ms-2 me-lg-auto">{{company_name}}</span>
                     <!-- <a href="/configuration">
                         <i class="bi bi-gear-fill"></i>
@@ -31,14 +28,14 @@
         <div class="container">
             <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
                 <ol class="breadcrumb mt-3 align-items-center">
-                    <li class="breadcrumb-item"><a href="/"><h3><span class="badge bg-primary">Pagina principala</span></h3></a></li>
+                    <li class="breadcrumb-item"><a href="/"><h3><span class="badge bg-secondary">Pagina principala</span></h3></a></li>
                     <i class="bi bi-chevron-right mx-2"></i>
-                    <li class="breadcrumb-item active"><h3><span class="badge bg-secondary">Configurare ecrane</span></h3></li>
+                    <li class="breadcrumb-item active"><h3><span class="badge bg-success">Configurare ecrane</span></h3></li>
                 </ol>
             </nav>
 
             <div class="mb-3">
-                <div class="form-floating col-sm-5">
+                <div class="form-floating col-sm-6">
                     <select class="form-select" id="displaySelect" aria-label="Select display">
                         % for k,v in displays.items():
                             <option value="{{k}}">{{v}}</option>
@@ -48,7 +45,7 @@
                 </div>
             </div>
 
-            <div class="mb-3 col-sm-5">
+            <div class="mb-3 col-sm-6">
                 <div class="input-group mb-3">
                     <input type="text" list=products class="form-control" id="productInput" placeholder="Cauta produs" aria-describedby="addProductButton">
                     <button class="btn btn-success btn-lg" type="button" id="addProductButton" onclick="addItem()">
@@ -61,22 +58,23 @@
                     % end
                 </datalist>
             </div>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover table-bordered border-white">
-                        <thead class="table-dark">
-                            <tr>
-                                <th class="col-md-1">#</th>
-                                <th>Denumire</th>
-                                <th class="col-md-1">Pret</th>
-                                <th class="col-md-1">U.M</th>
-                                <th class="col-md-1">Cantitate</th>
-                                <th class="col-md-1"></th>
-                            </tr>
-                        </thead>
-                        <tbody class=""></tbody>
-                    </table>
-                </div>
+              
+            <div class="table-responsive">
+                <table class="table table-striped table-hover table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="col-md-1">#</th>
+                            <th>Denumire</th>
+                            <th class="col-md-1">Pret</th>
+                            <th class="col-md-1">U.M</th>
+                            <th class="col-md-1">Cantitate</th>
+                            <th class="col-md-1"></th>
+                        </tr>
+                    </thead>
+                    <tbody class=""></tbody>
+                </table>
             </div>
+        </div>
     </body>
     <!-- FOOTER IMPORTS -->
     <script src="static/js/bootstrap.bundle.min.js"></script>
@@ -86,6 +84,9 @@
         // GLOBAL VARS
         var HOST_ADDRESS = document.location.hostname;
         var HOST_PORT = document.location.port;
+        var PRODUCTS = {
+                'all': []
+            };
 
         function addItem() {
             let gama = $('#displaySelect').find("option:selected").val();
@@ -126,45 +127,55 @@
             })
         }
 
+        function createTableWithProducts(productList) {
+            // remove elements from table
+            let table = $('table > tbody > tr');
+            table.remove();
+
+            table = $('table > tbody');
+
+            if (productList.length === 0) {
+                let tr = $('<tr></tr>').addClass('align-middle');
+                tr.append($('<td></td>').attr('colspan', 6).addClass('text-center p-3').text('Nu exista produse adaugate pentru ecranul selectat!'));
+                tr.appendTo(table);
+            }
+
+            for (let i = 0; i < productList.length; i++) {
+                let tr = $('<tr></tr>').addClass('align-middle');
+                if (productList[i]['quantity'] === 0) {
+                    tr.addClass('bg-danger')
+                }
+
+                tr.append($('<th></th>').text(i+1).attr('scope', 'row'));
+                tr.append($('<td></td>').text(productList[i]['name']));
+                tr.append($('<td></td>').text(productList[i]['price']));
+                tr.append($('<td></td>').text(productList[i]['um']));
+                tr.append($('<td></td>').text(productList[i]['quantity']));
+
+                let trash_button = $('<button></button>').attr('type', 'button').addClass('btn btn-danger border border-white').click(function() { deleteItem(productList[i]['barcode']) });
+                trash_button.append($('<i></i>').addClass('bi bi-trash'));
+
+                tr.append($('<td></td>').append(trash_button));
+                tr.appendTo(table);
+            }
+        }
+
         function get_items(gama) {
+            PRODUCTS = {
+                'all': []
+            };
             $.ajax({
                 type: "GET",
                 url: "http://" + HOST_ADDRESS + ":" + HOST_PORT + "/json_items?gama=" + gama,
                 dataType: "json",
                 success: function (result, status, xhr) {
-                    // remove elements from table
-                    let table = $('table > tbody > tr');
-                    table.remove();
-
-                    table = $('table > tbody');
-
                     if ('extras' in result[gama]) {
-                        result[gama] = result[gama]['extras'];
-                    }
-
-                    if (result[gama].length === 0) {
-                        let tr = $('<tr></tr>').addClass('align-middle');
-                        tr.append($('<td></td>').attr('colspan', 6).addClass('text-center p-3').text('Nu exista produse adaugate pentru ecranul selectat!'));
-                        tr.appendTo(table);
-                    }
-
-                    for (let i = 0; i < result[gama].length; i++) {
-                        let tr = $('<tr></tr>').addClass('align-middle');
-                        if (result[gama][i]['quantity'] === 0) {
-                            tr.addClass('bg-danger')
-                        }
-
-                        tr.append($('<th></th>').text(i+1).attr('scope', 'row'));
-                        tr.append($('<td></td>').text(result[gama][i]['name']));
-                        tr.append($('<td></td>').text(result[gama][i]['price']));
-                        tr.append($('<td></td>').text(result[gama][i]['um']));
-                        tr.append($('<td></td>').text(result[gama][i]['quantity']));
-
-                        let trash_button = $('<button></button>').attr('type', 'button').addClass('btn btn-danger border border-white').click(function() { deleteItem(result[gama][i]['barcode']) });
-                        trash_button.append($('<i></i>').addClass('bi bi-trash'));
-
-                        tr.append($('<td></td>').append(trash_button));
-                        tr.appendTo(table);
+                        PRODUCTS['all'] = result[gama][gama];
+                        PRODUCTS['extras'] = result[gama]['extras'];
+                        createTableWithProducts(PRODUCTS['extras']);
+                    } else {
+                        PRODUCTS['all'] = result[gama];
+                        createTableWithProducts(PRODUCTS['all']);
                     }
                 }
             });
@@ -175,6 +186,12 @@
             var valueSelected  = optionSelected.val();
             
             get_items(valueSelected);
+
+            if (valueSelected == 'fruits' || valueSelected == 'vegetables') {
+                $('#displayAllProducts').removeClass('visually-hidden');
+            } else {
+                $('#displayAllProducts').addClass('visually-hidden');
+            }
         }
 
         $('select').change(function () {

@@ -4,8 +4,13 @@ html, body {
   }
 
 .my-header {
-    background-color: #e7ecee;
-    color: #F68124;
+    background-color: #000000;
+    color: #ffffff;
+}
+
+.custom-app-button {
+    background-color: #F68124;
+    border-color: #F68124;
 }
 
 .logo {
@@ -24,4 +29,9 @@ i.bi.bi-gear-fill:hover {
 
 li > h3, li > a > h3 {
     margin-bottom: 0;
+}
+
+.form-check-input:checked {
+    background-color: #F68124;
+    border-color: #F68124;
 }

@@ -16,9 +16,6 @@
         <header class="my-header">
             <div class="container p-2">
                 <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                    <a href="/">
-                        <img src="static/resources/ldp.png" class="float-start mw-5 logo" alt="Home LDP">
-                    </a>
                     <span class="fs-4 fw-bolder p-2 ms-2 me-lg-auto">{{company_name}}</span>
                     <!-- <a href="/configuration">
                         <i class="bi bi-gear-fill"></i>
@@ -30,20 +27,20 @@
         <!-- BODY -->
         <div class="container">
             <nav style="--bs-breadcrumb-divider: '';" aria-label="breadcrumb">
-                <ol class="breadcrumb mt-3">
-                    <li class="breadcrumb-item active"><h3><span class="badge bg-secondary">Pagina principala</span></h3></li>
+                <ol class="breadcrumb mt-3 mb-3">
+                    <li class="breadcrumb-item active"><h3><span class="badge bg-success">Pagina principala</span></h3></li>
                 </ol>
             </nav>
 
             <div class="row mb-3">
                 <div class="col-sm-6">
                     <div class="card h-100">
-                        <div class="card-header text-bg-secondary fw-bold">Configurare elemente ecran</div>
+                        <div class="card-header text-bg-success fw-bold">Configurare elemente ecran</div>
                         <div class="card-body">
                             <p class="card-text">Permite selectarea ecranului dorit si vizualizarea produselor curente, adaugarea/eliminarea de produse</p>
                         </div>
                         <div class="card-footer">
-                            <a href="/displayConfiguration" role="button" class="btn btn-success w-100">Configurare ecrane</a>
+                            <a href="/displayConfiguration" role="button" class="btn btn-warning custom-app-button w-100">Configurare produse ecrane</a>
                         </div>
                     </div>
                 </div>
