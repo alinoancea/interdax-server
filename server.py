@@ -85,16 +85,24 @@ def json_items():
     return json.dumps(r)
 
 
-@bottle.route('/displayConfiguration', method='GET')
-def displayConfiguration():
+@bottle.route('/productConfiguration', method='GET')
+def productConfiguration():
     products = convert_barcodes()
     displays = CONFIG_FILE['company']['display']
 
     return bottle.template(
-            'displayConfiguration',
+            'productConfiguration',
             company_name=CONFIG_FILE['company']['name'].upper(),
             displays=displays,
             products=products
+    )
+
+
+@bottle.route('/displayConfiguration', method='GET')
+def displayConfiguration():
+    return bottle.template(
+            'displayConfiguration',
+            company_name=CONFIG_FILE['company']['name'].upper(),
     )
 
 
